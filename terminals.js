@@ -8,9 +8,10 @@ class Rect {
 	}
 
 	collidesWith(other) {
-		var xoverlap = (this.x < other.x+other.w && other.x < this.x) || (this.x+this.w < other.x+other.w && other.x < this.x+this.w) || (this.x === other.x && this.x+other.w === other.x+other.w)
-		var yoverlap = (this.y < other.y+other.h && other.y < this.y) || (this.y+this.h < other.y+other.h && other.y < this.y+this.h) || (this.y === other.y && this.y+other.h === other.y+other.h)
-		return xoverlap && yoverlap
+		return (this.x < other.x + other.w &&
+				this.x + this.w > other.x &&
+				this.y < other.y + other.h &&
+				this.h + this.y > other.y)
 	}
 
 }
@@ -32,15 +33,16 @@ class GameObject {
 	}
 
 	move(speed, xdir, ydir) {
-		var nx = speed * xdir
-		var ny = speed * ydir
+		let nx = speed * xdir
+		let ny = speed * ydir
 		this.rect.x += nx
 		this.rect.y += ny
 		if (this.gravity) {
 			this.falling = true
 		}
 
-		for (var i = 0; i < this.col.length; i++) {
+		// collision detection
+		for (let i = 0; i < this.col.length; i++) {
 			if (this.rect.collidesWith(this.col[i].rect) && this != this.col[i]) {
 				if (nx > 0) {
 					this.rect.x = this.col[i].rect.x-this.rect.w
@@ -55,6 +57,7 @@ class GameObject {
 				}
 
 				if (ny < 0) {
+					this.vy = 0
 					this.rect.y = this.col[i].rect.y+this.col[i].rect.h
 				}
 			}
@@ -64,8 +67,8 @@ class GameObject {
 		this.brect.y = this.rect.y+this.rect.h
 
 		if (this.gravity) {
-			for (var i = 0; i < this.col.length; i++) {
-				if (this.brect.collidesWith(this.col[i].rect)) {
+			for (let i = 0; i < this.col.length; i++) {
+				if (this.brect.collidesWith(this.col[i].rect) && this.vy >= 0) {
 					this.falling = false
 					this.vy = 0
 				}
@@ -75,7 +78,7 @@ class GameObject {
 	}
 
 	fall() {
-		var t = 15
+		let t = 15
 		this.vy += 0.3
 		if (Math.min(t, this.vy) === t) {
 			this.vy = t
@@ -95,29 +98,40 @@ class Game {
 	constructor() {
 		this.maxFPS = 60
 
-		this.keyState = new Array(300)
-
-		document.addEventListener("keydown", function(e){this.keyState[e.keyCode || e.which] = true}.bind(this))
-		document.addEventListener("keyup", function(e){this.keyState[e.keyCode || e.which] = false}.bind(this))
-
 		// Canvas initialization
 		this.canvas = document.createElement("canvas")
 		this.canvas.width = 800
 		this.canvas.height = 500
+		this.canvas.tabIndex = 1
+		this.canvas.style.outline = "none"
 		this.canvas.style.backgroundColor = "black"
 		this.context = this.canvas.getContext("2d")
 		document.body.insertBefore(this.canvas, document.body.childNodes[0])
 		this.frameNo = 0
 		this.interval = setInterval(this.update.bind(this), 1000/this.maxFPS)
+
+		// Event Listeners
+
+		this.keyState = {}
+
+		this.canvas.addEventListener("keydown", (e) => {this.keyState[e.code] = true})
+		this.canvas.addEventListener("keyup", (e) => {this.keyState[e.code] = false})
+
 		
 		this.entities = []
 
-		var what = new Rect(10, 10, 50, 50)
-		var is = new Rect(10, 480, 600, 10)
+		let what = new Rect(10, 10, 50, 50)
+		let is = new Rect(10, 480, 600, 10)
+		let testPlatRect = new Rect(500, 440, 50, 10)
+		let testPlatRect1 = new Rect(400, 400, 10, 50)
 		this.hey = new GameObject(what, this.entities, "#0F0", true)
 		this.up = new GameObject(is, this.entities, "#00F", false)
+		this.testPlat = new GameObject(testPlatRect, this.entities, '#00F', false)
+		this.testPlat1 = new GameObject(testPlatRect1, this.entities, '#00F', false)
 		this.entities.push(this.hey)
 		this.entities.push(this.up)
+		this.entities.push(this.testPlat)
+		this.entities.push(this.testPlat1)
 	}
 
 	drawRect(color, rect) {
@@ -128,7 +142,7 @@ class Game {
 	update() {
 		this.clearScreen()
 
-		for (var i = 0; i < this.entities.length; i++) {
+		for (let i = 0; i < this.entities.length; i++) {
 			this.drawRect(this.entities[i].color, this.entities[i].rect)
 
 			if (this.entities[i].falling) {
@@ -136,15 +150,15 @@ class Game {
 			}
 		}	
 
-		if (this.keyState[188] === true && !this.hey.falling) { // comma
+		if (this.keyState["KeyW"] === true && !this.hey.falling) {
 			this.hey.jump()
 		}
 
-		if (this.keyState[65] === true) { // a
+		if (this.keyState["KeyA"] === true) {
 			this.hey.move(4, -1, 0)
 		}
 
-		if (this.keyState[69]) { //e
+		if (this.keyState["KeyD"]) {
 			this.hey.move(4, 1, 0)
 		}
 	}
@@ -155,4 +169,4 @@ class Game {
 
 }
 
-var hey = new Game()
+let hey = new Game()
