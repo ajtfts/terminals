@@ -35,6 +35,7 @@ class GameObject {
 	move(speed, xdir, ydir) {
 		let nx = speed * xdir
 		let ny = speed * ydir
+		let didMove = true
 		this.rect.x += nx
 		this.rect.y += ny
 		if (this.gravity) {
@@ -60,6 +61,7 @@ class GameObject {
 					this.vy = 0
 					this.rect.y = this.col[i].rect.y+this.col[i].rect.h
 				}
+				didMove = false
 			}
 		}
 
@@ -74,7 +76,7 @@ class GameObject {
 				}
 			}
 		}
-
+	return didMove
 	}
 
 	fall() {
@@ -115,8 +117,9 @@ class MovingPlat extends GameObject {
 
 	platMove() {
 		if (this.moved <= this.distance) {
-			this.move(this.speed, this.xdir, this.ydir)
-			this.moved += this.speed
+			if (this.move(this.speed, this.xdir, this.ydir)) {
+				this.moved += this.speed
+			}
 		} else {
 			this.xdir *= -1
 			this.ydir *= -1
