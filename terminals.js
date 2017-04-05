@@ -29,7 +29,7 @@ class GameObject {
 
 		this.vy = 0
 
-		this.move(0, 0, 0)
+		// this.move(0, 0, 0)
 	}
 
 	move(speed, xdir, ydir) {
@@ -86,9 +86,42 @@ class GameObject {
 		this.move(this.vy, 0, 1)
 	}
 
+}
+
+class Player extends GameObject {
+	
+	constructor(rect, col) {
+		super(rect, col, "#0F0", true)
+	}
+
 	jump() {
 		this.vy = -8
 		this.fall()
+	}
+}
+
+class MovingPlat extends GameObject {
+
+	constructor(rect, col, xdir, ydir, distance, speed) {
+		super(rect, col, "#F0F", false)
+		this.xdir = xdir
+		this.ydir = ydir
+		this.distance = distance
+		this.speed = speed
+
+		this.active = true
+		this.moved = 0
+	}
+
+	platMove() {
+		if (this.moved <= this.distance) {
+			this.move(this.speed, this.xdir, this.ydir)
+			this.moved += this.speed
+		} else {
+			this.xdir *= -1
+			this.ydir *= -1
+			this.moved = 0
+		}
 	}
 
 }
@@ -100,8 +133,8 @@ class Game {
 
 		// Canvas initialization
 		this.canvas = document.createElement("canvas")
-		this.canvas.width = 800
-		this.canvas.height = 500
+		this.canvas.width = 1000
+		this.canvas.height = 562
 		this.canvas.tabIndex = 1
 		this.canvas.style.outline = "none"
 		this.canvas.style.backgroundColor = "black"
@@ -122,16 +155,16 @@ class Game {
 
 		let what = new Rect(10, 10, 50, 50)
 		let is = new Rect(10, 480, 600, 10)
-		let testPlatRect = new Rect(500, 440, 50, 10)
-		let testPlatRect1 = new Rect(400, 400, 10, 50)
-		this.hey = new GameObject(what, this.entities, "#0F0", true)
+		let testPlatRect = new Rect(100, 380, 80, 10)
+		let testPlatRect0 = new Rect(620, 480, 80, 10)
+		this.hey = new Player(what, this.entities)
 		this.up = new GameObject(is, this.entities, "#00F", false)
-		this.testPlat = new GameObject(testPlatRect, this.entities, '#00F', false)
-		this.testPlat1 = new GameObject(testPlatRect1, this.entities, '#00F', false)
+		this.testPlat = new MovingPlat(testPlatRect, this.entities, 1, 0, 100, 2)
+		this.testPlat0 = new MovingPlat(testPlatRect0, this.entities, 0, -1, 100, 2)
 		this.entities.push(this.hey)
 		this.entities.push(this.up)
 		this.entities.push(this.testPlat)
-		this.entities.push(this.testPlat1)
+		this.entities.push(this.testPlat0)
 	}
 
 	drawRect(color, rect) {
@@ -142,10 +175,12 @@ class Game {
 	update() {
 		this.clearScreen()
 
+		this.testPlat.platMove()
+		this.testPlat0.platMove()
+
 		for (let i = 0; i < this.entities.length; i++) {
 			this.drawRect(this.entities[i].color, this.entities[i].rect)
-
-			if (this.entities[i].falling) {
+			if (this.entities[i].gravity === true) {
 				this.entities[i].fall()
 			}
 		}	
