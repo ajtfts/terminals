@@ -14,12 +14,19 @@ class Rect {
 				this.h + this.y > other.y)
 	}
 
+	toString() {return "[object Rect]"}
+
 }
 
 class GameObject {
 
 	constructor(rect, col, color="#F00", gravity=false) {
-		this.rect = rect
+		if (rect.toString() !== "[object Rect]") {
+			this.rect = new Rect(rect[0], rect[1], rect[2], rect[3])
+		}
+		else {
+			this.rect = rect
+		}
 		this.col = col
 		this.color = color
 		this.gravity = gravity
@@ -29,7 +36,7 @@ class GameObject {
 
 		this.vy = 0
 
-		// this.move(0, 0, 0)
+		this.col.push(this)
 	}
 
 	move(speed, xdir, ydir) {
@@ -76,7 +83,9 @@ class GameObject {
 				}
 			}
 		}
+	
 	return didMove
+	
 	}
 
 	fall() {
@@ -87,6 +96,8 @@ class GameObject {
 		}
 		this.move(this.vy, 0, 1)
 	}
+
+	toString() {return "[Object GameObject]"}
 
 }
 
@@ -100,6 +111,9 @@ class Player extends GameObject {
 		this.vy = -8
 		this.fall()
 	}
+
+	toString() {return "[Object Player]"}
+
 }
 
 class MovingPlat extends GameObject {
@@ -125,7 +139,10 @@ class MovingPlat extends GameObject {
 			this.ydir *= -1
 			this.moved = 0
 		}
+
 	}
+
+	toString() {return "[Object MovingPlat]"}
 
 }
 
@@ -156,18 +173,11 @@ class Game {
 		
 		this.entities = []
 
-		let what = new Rect(10, 10, 50, 50)
-		let is = new Rect(10, 480, 600, 10)
-		let testPlatRect = new Rect(100, 380, 80, 10)
-		let testPlatRect0 = new Rect(620, 480, 80, 10)
-		this.hey = new Player(what, this.entities)
-		this.up = new GameObject(is, this.entities, "#00F", false)
-		this.testPlat = new MovingPlat(testPlatRect, this.entities, 1, 0, 100, 2)
-		this.testPlat0 = new MovingPlat(testPlatRect0, this.entities, 0, -1, 100, 2)
-		this.entities.push(this.hey)
-		this.entities.push(this.up)
-		this.entities.push(this.testPlat)
-		this.entities.push(this.testPlat0)
+		this.hey = new Player([10, 10, 50, 50], this.entities)
+		this.up = new GameObject([10, 480, 600, 10], this.entities, "#00F", false)
+		this.testPlat = new MovingPlat([100, 380, 80, 10], this.entities, 1, 0, 100, 2)
+		this.testPlat0 = new MovingPlat([620, 480, 80, 10], this.entities, 0, -1, 100, 2)
+
 	}
 
 	drawRect(color, rect) {
@@ -208,3 +218,4 @@ class Game {
 }
 
 let hey = new Game()
+
