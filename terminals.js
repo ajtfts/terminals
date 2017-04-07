@@ -21,7 +21,7 @@ class Rect {
 class GameObject {
 
 	constructor(rect, col, color="#F00", gravity=false) {
-		if (rect.toString() !== "[object Rect]") {
+		if (!(rect instanceof Rect)) {
 			this.rect = new Rect(rect[0], rect[1], rect[2], rect[3])
 		}
 		else {
@@ -160,8 +160,7 @@ class Game {
 		this.canvas.style.backgroundColor = "black"
 		this.context = this.canvas.getContext("2d")
 		document.body.insertBefore(this.canvas, document.body.childNodes[0])
-		this.frameNo = 0
-		this.interval = setInterval(this.update.bind(this), 1000/this.maxFPS)
+		this.lastframe = +new Date
 
 		// Event Listeners
 
@@ -178,6 +177,8 @@ class Game {
 		this.testPlat = new MovingPlat([100, 380, 80, 10], this.entities, 1, 0, 100, 2)
 		this.testPlat0 = new MovingPlat([620, 480, 80, 10], this.entities, 0, -1, 100, 2)
 
+		this.update()
+
 	}
 
 	drawRect(color, rect) {
@@ -187,6 +188,9 @@ class Game {
 
 	update() {
 		this.clearScreen()
+
+		this.now = +new Date
+		this.deltaT = this.now - this.lastframe
 
 		this.testPlat.platMove()
 		this.testPlat0.platMove()
@@ -209,6 +213,10 @@ class Game {
 		if (this.keyState["KeyD"]) {
 			this.hey.move(4, 1, 0)
 		}
+
+		this.lastframe = this.now
+
+		window.requestAnimationFrame(this.update.bind(this)) 
 	}
 
 	clearScreen() {
