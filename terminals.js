@@ -178,7 +178,7 @@ class Game {
 		
 		let testLevel = function() {
 			this.playerPos = [100, 10]
-			new GameObject([40, 500, 50, 10], this.entities, "#F0F", false)
+			new MovingPlat([40, 450, 50, 10], this.entities, 0, -1, 100, 1)
 			new GameObject([10, 530, 980, 10], this.entities, "#00F", false)
 		
 		}
@@ -223,7 +223,10 @@ class Game {
 			if (this.entities[i].gravity === true) {
 				this.entities[i].fall()
 			}
-		}	
+			if (this.entities[i] instanceof MovingPlat && this.entities[i].active) {
+				this.entities[i].platMove()
+			}
+		}
 
 		if (this.keyState["KeyW"] === true && !this.player.falling) {
 			this.player.jump()
