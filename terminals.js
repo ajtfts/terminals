@@ -129,15 +129,25 @@ class MovingPlat extends GameObject {
 		this.distance = distance
 		this.speed = speed
 
-		xdir === 0 ? this.axis = 1 : this.axis = 0
-
 		this.active = true
 		this.moved = 0
 	}
 
 	platMove() {
 		if (this.moved < this.distance) {
-			this.moved += Math.abs(this.move(this.speed, this.xdir, this.ydir)[this.axis])
+			let xMove = this.move(this.speed, this.xdir, 0)[0]
+			let yMove = this.move(this.speed, 0, this.ydir)[1]
+			this.moved += Math.sqrt(xMove**2 + yMove**2)
+			
+			for (let i = 0; i < this.col.length; i++) {
+				if (this.col[i] instanceof Player) {
+					console.log(this.col[i].brect.collidesWith(this.rect))
+				}
+				if (this.col[i].brect.collidesWith(this.rect)) {
+					this.col[i].move(this.speed, this.xdir, 0)
+					this.col[i].move(this.speed, 0, this.ydir)
+			}
+		}
 		} else {
 			this.xdir *= -1
 			this.ydir *= -1
@@ -183,6 +193,7 @@ class Game {
 		let testLevel = function() {
 			this.playerPos = [100, 10]
 			new MovingPlat([40, 450, 50, 10], this.entities, 0, -1, 100, 2)
+			new MovingPlat([400, 460, 50, 10], this.entities, 1, 0, 100, 2)
 			new GameObject([10, 530, 980, 10], this.entities, "#00F", false)
 		
 		}
