@@ -42,7 +42,9 @@ class GameObject {
 	move(speed, xdir, ydir) {
 		let nx = speed * xdir
 		let ny = speed * ydir
-		let didMove = true
+		let xMoved = 0
+		let yMoved = 0
+		let temp = [this.rect.x, this.rect.y]
 		this.rect.x += nx
 		this.rect.y += ny
 		if (this.gravity) {
@@ -67,11 +69,13 @@ class GameObject {
 				if (ny < 0) {
 					this.vy = 0
 					this.rect.y = this.col[i].rect.y+this.col[i].rect.h
-				}
-				didMove = false
+				}	
 			}
 		}
 
+		xMoved = this.rect.x - temp[0]
+		yMoved = this.rect.y - temp[1]
+		
 		this.brect.x = this.rect.x
 		this.brect.y = this.rect.y+this.rect.h
 
@@ -83,8 +87,8 @@ class GameObject {
 				}
 			}
 		}
-	
-	return didMove
+
+		return [xMoved, yMoved]
 	
 	}
 
@@ -125,15 +129,15 @@ class MovingPlat extends GameObject {
 		this.distance = distance
 		this.speed = speed
 
+		xdir === 0 ? this.axis = 1 : this.axis = 0
+
 		this.active = true
 		this.moved = 0
 	}
 
 	platMove() {
-		if (this.moved <= this.distance) {
-			if (this.move(this.speed, this.xdir, this.ydir)) {
-				this.moved += this.speed
-			}
+		if (this.moved < this.distance) {
+			this.moved += Math.abs(this.move(this.speed, this.xdir, this.ydir)[this.axis])
 		} else {
 			this.xdir *= -1
 			this.ydir *= -1
@@ -178,19 +182,12 @@ class Game {
 		
 		let testLevel = function() {
 			this.playerPos = [100, 10]
-			new MovingPlat([40, 450, 50, 10], this.entities, 0, -1, 100, 1)
+			new MovingPlat([40, 450, 50, 10], this.entities, 0, -1, 100, 2)
 			new GameObject([10, 530, 980, 10], this.entities, "#00F", false)
 		
 		}
 
-		let otherLevel = function() {
-			this.playerPos = [200, 10]
-			new GameObject([600, 460, 10, 50], this.entities, "#FF0", false)
-			new GameObject([10, 530, 980, 10], this.entities, "#F00", false)
-		}
-
 		this.addLevel("testLevel", testLevel)
-		this.addLevel("otherLevel", otherLevel)
 		this.update()
 
 	}
