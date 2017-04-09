@@ -172,12 +172,38 @@ class Game {
 		
 		this.entities = []
 
-		this.hey = new Player([10, 10, 50, 50], this.entities)
-		this.up = new GameObject([10, 480, 600, 10], this.entities, "#00F", false)
-		this.testPlat = new MovingPlat([100, 380, 80, 10], this.entities, 1, 0, 100, 2)
-		this.testPlat0 = new MovingPlat([620, 480, 80, 10], this.entities, 0, -1, 100, 2)
+		this.player = new Player([10, 10, 50, 50], this.entities)
 
+		this.levels = {}
+		
+		let testLevel = function() {
+			this.playerPos = [100, 10]
+			new GameObject([40, 500, 50, 10], this.entities, "#F0F", false)
+			new GameObject([10, 530, 980, 10], this.entities, "#00F", false)
+		
+		}
+
+		let otherLevel = function() {
+			this.playerPos = [200, 10]
+			new GameObject([600, 460, 10, 50], this.entities, "#FF0", false)
+			new GameObject([10, 530, 980, 10], this.entities, "#F00", false)
+		}
+
+		this.addLevel("testLevel", testLevel)
+		this.addLevel("otherLevel", otherLevel)
 		this.update()
+
+	}
+
+	addLevel(levelID, callback) {
+		this.levels[levelID] = callback.bind(this)
+	}
+
+	loadLevel(levelID) {
+		this.entities = []
+		this.levels[levelID]()
+		this.player = new Player([this.playerPos[0], this.playerPos[1], 50, 50], this.entities)
+		this.loaded = levelID
 
 	}
 
@@ -192,9 +218,6 @@ class Game {
 		this.now = +new Date
 		this.deltaT = this.now - this.lastframe
 
-		this.testPlat.platMove()
-		this.testPlat0.platMove()
-
 		for (let i = 0; i < this.entities.length; i++) {
 			this.drawRect(this.entities[i].color, this.entities[i].rect)
 			if (this.entities[i].gravity === true) {
@@ -202,16 +225,16 @@ class Game {
 			}
 		}	
 
-		if (this.keyState["KeyW"] === true && !this.hey.falling) {
-			this.hey.jump()
+		if (this.keyState["KeyW"] === true && !this.player.falling) {
+			this.player.jump()
 		}
 
 		if (this.keyState["KeyA"] === true) {
-			this.hey.move(4, -1, 0)
+			this.player.move(4, -1, 0)
 		}
 
 		if (this.keyState["KeyD"]) {
-			this.hey.move(4, 1, 0)
+			this.player.move(4, 1, 0)
 		}
 
 		this.lastframe = this.now
@@ -227,3 +250,4 @@ class Game {
 
 let hey = new Game()
 
+hey.loadLevel("testLevel")
