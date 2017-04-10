@@ -135,16 +135,17 @@ class MovingPlat extends GameObject {
 
 	platMove() {
 		if (this.moved < this.distance) {
-			let xMove = this.move(this.speed, this.xdir, 0)[0]
-			let yMove = this.move(this.speed, 0, this.ydir)[1]
-			this.moved += Math.sqrt(xMove**2 + yMove**2)
-
 			for (let i = 0; i < this.col.length; i++) {
 				if (this.col[i].brect.collidesWith(this.rect)) {
 					this.col[i].move(this.speed, this.xdir, 0)
 					this.col[i].move(this.speed, 0, this.ydir)
 				}
+
 			}
+
+			let xMove = this.move(this.speed, this.xdir, 0)[0]
+			let yMove = this.move(this.speed, 0, this.ydir)[1]
+			this.moved += Math.sqrt(xMove**2 + yMove**2)
 		} else {
 			this.xdir *= -1
 			this.ydir *= -1
