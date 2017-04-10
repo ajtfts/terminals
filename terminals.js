@@ -138,7 +138,7 @@ class MovingPlat extends GameObject {
 			let xMove = this.move(this.speed, this.xdir, 0)[0]
 			let yMove = this.move(this.speed, 0, this.ydir)[1]
 			this.moved += Math.sqrt(xMove**2 + yMove**2)
-			
+
 			for (let i = 0; i < this.col.length; i++) {
 				if (this.col[i].brect.collidesWith(this.rect)) {
 					this.col[i].move(this.speed, this.xdir, 0)
@@ -227,11 +227,11 @@ class Game {
 
 		// update game logic
 		for (let i = 0; i < this.entities.length; i++) {
-			if (this.entities[i].gravity === true) {
-				this.entities[i].fall()
-			}
 			if (this.entities[i] instanceof MovingPlat && this.entities[i].active) {
 				this.entities[i].platMove()
+			}
+			if (this.entities[i].gravity === true) {
+				this.entities[i].fall()
 			}
 		}
 
