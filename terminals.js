@@ -75,7 +75,7 @@ class GameObject {
 
 		xMoved = this.rect.x - temp[0]
 		yMoved = this.rect.y - temp[1]
-		
+	
 		this.brect.x = this.rect.x
 		this.brect.y = this.rect.y+this.rect.h
 
@@ -140,14 +140,11 @@ class MovingPlat extends GameObject {
 			this.moved += Math.sqrt(xMove**2 + yMove**2)
 			
 			for (let i = 0; i < this.col.length; i++) {
-				if (this.col[i] instanceof Player) {
-					console.log(this.col[i].brect.collidesWith(this.rect))
-				}
 				if (this.col[i].brect.collidesWith(this.rect)) {
 					this.col[i].move(this.speed, this.xdir, 0)
 					this.col[i].move(this.speed, 0, this.ydir)
+				}
 			}
-		}
 		} else {
 			this.xdir *= -1
 			this.ydir *= -1
@@ -192,9 +189,11 @@ class Game {
 		
 		let testLevel = function() {
 			this.playerPos = [100, 10]
-			new MovingPlat([40, 450, 50, 10], this.entities, 0, -1, 100, 2)
+			new MovingPlat([800, 500, 50, 10], this.entities, 0, -1, 400, 2)
 			new MovingPlat([400, 460, 50, 10], this.entities, 1, 0, 100, 2)
-			new GameObject([10, 530, 980, 10], this.entities, "#00F", false)
+			new GameObject([10, 530, 300, 10], this.entities, "#00F", false)
+			new GameObject([690, 530, 300, 10], this.entities, "#00F", false)
+			new GameObject([890, 100, 100, 10], this.entities, "#00F", false)
 		
 		}
 
@@ -226,8 +225,8 @@ class Game {
 		this.now = +new Date
 		this.deltaT = this.now - this.lastframe
 
+		// update game logic
 		for (let i = 0; i < this.entities.length; i++) {
-			this.drawRect(this.entities[i].color, this.entities[i].rect)
 			if (this.entities[i].gravity === true) {
 				this.entities[i].fall()
 			}
@@ -246,6 +245,11 @@ class Game {
 
 		if (this.keyState["KeyD"]) {
 			this.player.move(4, 1, 0)
+		}
+
+		// draw
+		for (let i = 0; i < this.entities.length; i++) {
+			this.drawRect(this.entities[i].color, this.entities[i].rect)
 		}
 
 		this.lastframe = this.now
