@@ -227,32 +227,35 @@ class Game {
 		this.now = +new Date
 		this.deltaT = this.now - this.lastframe
 
-		// update game logic
-		for (let i = 0; i < this.entities.length; i++) {
-			if (this.entities[i] instanceof MovingPlat && this.entities[i].active) {
-				this.entities[i].platMove()
+		if (this.deltaT < 64) {
+
+			// update game logic
+			for (let i = 0; i < this.entities.length; i++) {
+				if (this.entities[i] instanceof MovingPlat && this.entities[i].active) {
+					this.entities[i].platMove()
+				}
+				if (this.entities[i].gravity === true) {
+					this.entities[i].fall()
+				}
 			}
-			if (this.entities[i].gravity === true) {
-				this.entities[i].fall()
+
+			// event handling
+			if (this.keyState["KeyW"] === true && !this.player.falling) {
+				this.player.jump()
 			}
-		}
 
-		// event handling
-		if (this.keyState["KeyW"] === true && !this.player.falling) {
-			this.player.jump()
-		}
+			if (this.keyState["KeyA"] === true) {
+				this.player.move(4, -1, 0)
+			}
 
-		if (this.keyState["KeyA"] === true) {
-			this.player.move(4, -1, 0)
-		}
+			if (this.keyState["KeyD"]) {
+				this.player.move(4, 1, 0)
+			}
 
-		if (this.keyState["KeyD"]) {
-			this.player.move(4, 1, 0)
-		}
-
-		// draw
-		for (let i = 0; i < this.entities.length; i++) {
-			this.drawRect(this.entities[i].color, this.entities[i].rect)
+			// draw
+			for (let i = 0; i < this.entities.length; i++) {
+				this.drawRect(this.entities[i].color, this.entities[i].rect)
+			}
 		}
 
 		this.lastframe = this.now
