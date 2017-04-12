@@ -20,14 +20,15 @@ class Rect {
 
 class GameObject {
 
-	constructor(rect, col, color="#F00", gravity=false) {
+	constructor(game, rect, color="#F00", gravity=false) {
 		if (!(rect instanceof Rect)) {
 			this.rect = new Rect(rect[0], rect[1], rect[2], rect[3])
 		}
 		else {
 			this.rect = rect
 		}
-		this.col = col
+		this.game = game
+		this.col = this.game.entities
 		this.color = color
 		this.gravity = gravity
 
@@ -40,8 +41,8 @@ class GameObject {
 	}
 
 	move(speed, xdir, ydir) {
-		let nx = speed * xdir
-		let ny = speed * ydir
+		let nx = speed * xdir * (this.game.deltaT/16)
+		let ny = speed * ydir * (this.game.deltaT/16)
 		let xMoved = 0
 		let yMoved = 0
 		let temp = [this.rect.x, this.rect.y]
@@ -107,8 +108,8 @@ class GameObject {
 
 class Player extends GameObject {
 	
-	constructor(rect, col) {
-		super(rect, col, "#0F0", true)
+	constructor(game, rect) {
+		super(game, rect, "#0F0", true)
 	}
 
 	jump() {
@@ -122,8 +123,8 @@ class Player extends GameObject {
 
 class MovingPlat extends GameObject {
 
-	constructor(rect, col, xdir, ydir, distance, speed) {
-		super(rect, col, "#F0F", false)
+	constructor(game, rect, xdir, ydir, distance, speed) {
+		super(game, rect, "#F0F", false)
 		this.xdir = xdir
 		this.ydir = ydir
 		this.distance = distance
@@ -184,17 +185,17 @@ class Game {
 		
 		this.entities = []
 
-		this.player = new Player([10, 10, 50, 50], this.entities)
+		this.player = new Player(this, [10, 10, 50, 50])
 
 		this.levels = {}
 		
 		let testLevel = function() {
 			this.playerPos = [100, 10]
-			new MovingPlat([800, 500, 50, 10], this.entities, 0, -1, 400, 2)
-			new MovingPlat([400, 460, 50, 10], this.entities, 1, 0, 100, 2)
-			new GameObject([10, 530, 300, 10], this.entities, "#00F", false)
-			new GameObject([690, 530, 300, 10], this.entities, "#00F", false)
-			new GameObject([890, 100, 100, 10], this.entities, "#00F", false)
+			new MovingPlat(this, [800, 500, 50, 10], 0, -1, 400, 2)
+			new MovingPlat(this, [400, 460, 50, 10], 1, 0, 100, 2)
+			new GameObject(this, [10, 530, 300, 10], "#00F", false)
+			new GameObject(this, [690, 530, 300, 10], "#00F", false)
+			new GameObject(this, [890, 100, 100, 10], "#00F", false)
 		
 		}
 
@@ -210,7 +211,7 @@ class Game {
 	loadLevel(levelID) {
 		this.entities = []
 		this.levels[levelID]()
-		this.player = new Player([this.playerPos[0], this.playerPos[1], 50, 50], this.entities)
+		this.player = new Player(this, [this.playerPos[0], this.playerPos[1], 50, 50])
 		this.loaded = levelID
 
 	}
@@ -236,6 +237,7 @@ class Game {
 			}
 		}
 
+		// event handling
 		if (this.keyState["KeyW"] === true && !this.player.falling) {
 			this.player.jump()
 		}
